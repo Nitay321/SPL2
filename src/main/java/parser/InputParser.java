@@ -29,12 +29,34 @@ public class InputParser {
             String operatorStr = jsonNode.get("operator").asText();
             ArrayNode operandJsonNodes = (ArrayNode) jsonNode.get("operands");
             List<ComputationNode> operands = new ArrayList<>();
+
+            
+
             for (int i = 0; i < operandJsonNodes.size(); i++) {
                 operands.add(parseJsonNode(operandJsonNodes.get(i)));
             }
-            return new ComputationNode(operatorStr, operands);
+
+            ComputationNode node = new ComputationNode(operatorStr, operands);
+            
+            // doing the 2.1 checks 
+            if (node.getNodeType()==ComputationNodeType.TRANSPOSE|| node.getNodeType()==ComputationNodeType.NEGATE) {
+                if (operands.size() != 1) {
+                    throw new ParseException("Unary operator requires exactly 1 operand", 0);
+                }
+            }            
+            if (node.getNodeType() == ComputationNodeType.ADD || node.getNodeType() == ComputationNodeType.MULTIPLY) {
+            if (operands.size() < 2) {
+                 throw new ParseException("Binary operator requires at least 2 operands", 0);
+            }
+            node.associativeNesting();
+            }
+        
+            
+
+            return node;
         }
         else if (jsonNode.isArray()) {
+
             if (jsonNode.size() == 0) {
                 throw new ParseException("Empty array cannot be parsed as DataNode.", 0);
             }
