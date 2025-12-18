@@ -87,8 +87,8 @@ public class SharedVector {
                 vector[i] += other.vector[i];
             }
         } finally {
-            writeUnlock();
             other.readUnlock();
+            writeUnlock();
         }
         
         // TODO: add two vectors
@@ -109,10 +109,40 @@ public class SharedVector {
 
     public double dot(SharedVector other) {
         // TODO: compute dot product (row · column)
-        return 0;
+        double result = 0.0;
+        readLock();
+        other.readLock();
+        try {
+            for (int i = 0; i < vector.length; i++) {
+                result += this.vector[i] * other.vector[i];
+            }
+        } finally {
+            other.readUnlock();
+            readUnlock();
+        }
+        return result;
     }
 
     public void vecMatMul(SharedMatrix matrix) {
-        // TODO: compute row-vector × matrix
+        int newSize = matrix.length(); 
+        double[] tempResult = new double[newSize];
+
+        // 2. Calculate efficiently (No Write Lock needed yet!)
+        for (int i = 0; i < newSize; i++) {
+            SharedVector column = matrix.get(i);
+            // dot() handles its own locking, so this is safe
+            tempResult[i] = this.dot(column); 
+        }
+
+        // 3. SWAP the data (Brief Write Lock)
+        writeLock();
+        try {
+            this.vector = tempResult;
+            this.orientation = VectorOrientation.ROW_MAJOR
+            ; // Result is always a Row
+        } finally {
+            writeUnlock();
+        }
     }
+
 }
