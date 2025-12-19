@@ -4,6 +4,7 @@ import parser.*;
 import memory.*;
 import scheduling.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LinearAlgebraEngine {
@@ -14,40 +15,127 @@ public class LinearAlgebraEngine {
 
     public LinearAlgebraEngine(int numThreads) {
         // TODO: create executor with given thread count
+        this.executor = new TiredExecutor(numThreads);
     }
 
     public ComputationNode run(ComputationNode computationRoot) {
+        
+        ComputationNode nodeToSolve = computationRoot.findResolvable();
+        while (nodeToSolve != null) {
+
+        loadAndCompute(nodeToSolve);
+        double[][] resultData = leftMatrix.readRowMajor();
+        nodeToSolve.resolve(resultData);
+
+        nodeToSolve = computationRoot.findResolvable();
+    }
         // TODO: resolve computation tree step by step until final matrix is produced
-        return null;
+        
+        
+        
+
+        return computationRoot;
     }
 
     public void loadAndCompute(ComputationNode node) {
-        // TODO: load operand matrices
-        // TODO: create compute tasks & submit tasks to executor
+        List<ComputationNode> children = node.getChildren();
+        ComputationNode child1 = null; 
+        ComputationNode child0 = children.get(0); // left 
+        if (children.size() > 1) {
+             child1 = children.get(1); // right
+        }
+
+
+
+        
+        ComputationNodeType type = node.getNodeType();
+        List<Runnable> tasks = null;
+    
+        if (type == ComputationNodeType.MULTIPLY) {
+            
+            leftMatrix.loadRowMajor(child0.getMatrix());
+            rightMatrix.loadColumnMajor(child1.getMatrix());
+            tasks = createMultiplyTasks();
+        }
+        else if (type == ComputationNodeType.ADD) {
+            leftMatrix.loadRowMajor(child0.getMatrix());
+            rightMatrix.loadRowMajor(child1.getMatrix());
+            tasks = createAddTasks();
+        }
+        else if (type == ComputationNodeType.NEGATE) {
+            leftMatrix.loadRowMajor(child0.getMatrix());
+            tasks = createNegateTasks();
+        }
+        else if (type == ComputationNodeType.TRANSPOSE) {
+            leftMatrix.loadColumnMajor(child0.getMatrix());
+            tasks = createTransposeTasks();
+        }
+        executor.submitAll(tasks);
+
+        
+
     }
 
     public List<Runnable> createAddTasks() {
+        List<Runnable> tasks = new ArrayList<>();
+        int rows = leftMatrix.length();
+        for (int i = 0; i < rows; i++) { 
+            final int index = i; 
+            Runnable task = () -> {
+                SharedVector v1  = leftMatrix.get(index);
+                SharedVector v2  = rightMatrix.get(index);
+                v1.add(v2);
+            };
+            tasks.add( task);
+
+                } 
+
+
+
+
+
         // TODO: return tasks that perform row-wise addition
-        return null;
+        return tasks; 
     }
 
     public List<Runnable> createMultiplyTasks() {
-        // TODO: return tasks that perform row × matrix multiplication
-        return null;
+    List<Runnable> tasks = new ArrayList<>();
+    int rows = leftMatrix.length();
+
+    for (int i = 0; i < rows; i++) {
+        final int rowIndex = i;
+        tasks.add(() -> {
+            leftMatrix.get(rowIndex).vecMatMul(rightMatrix);
+        });
+        }
+
+    return tasks;
     }
 
     public List<Runnable> createNegateTasks() {
-        // TODO: return tasks that negate rows
-        return null;
+        List<Runnable> tasks = new ArrayList<>();
+        int rows = leftMatrix.length();
+        for (int i = 0; i < rows; i++) {
+            final int index = i;
+            tasks.add(() -> {
+                SharedVector v = leftMatrix.get(index);
+                v.negate();
+            });
+            
+        }
+        
+        return tasks;
     }
 
     public List<Runnable> createTransposeTasks() {
         // TODO: return tasks that transpose rows
-        return null;
+        // matrix was loaded as column-major already 
+        return java.util.Collections.emptyList();
     }
 
     public String getWorkerReport() {
+        
         // TODO: return summary of worker activity
-        return null;
+        return executor.getWorkerReport();
     }
 }
