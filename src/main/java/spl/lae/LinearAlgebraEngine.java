@@ -4,6 +4,7 @@ import parser.*;
 import memory.*;
 import scheduling.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,10 @@ public class LinearAlgebraEngine {
     private SharedMatrix leftMatrix = new SharedMatrix();
     private SharedMatrix rightMatrix = new SharedMatrix();
     private TiredExecutor executor;
+
+
+
+
 
     public LinearAlgebraEngine(int numThreads) {
         // TODO: create executor with given thread count
@@ -46,20 +51,27 @@ public class LinearAlgebraEngine {
         }
 
 
-
-        
         ComputationNodeType type = node.getNodeType();
         List<Runnable> tasks = null;
-    
+        // we already checked that the matrecies amount are legal  for each operation
         if (type == ComputationNodeType.MULTIPLY) {
             
             leftMatrix.loadRowMajor(child0.getMatrix());
             rightMatrix.loadColumnMajor(child1.getMatrix());
+            if (leftMatrix.get(0).length() != rightMatrix.get(0).length()) {
+                throw new IllegalArgumentException("Incompatible matrix sizes for multiplication");
+            }
+
             tasks = createMultiplyTasks();
         }
         else if (type == ComputationNodeType.ADD) {
             leftMatrix.loadRowMajor(child0.getMatrix());
             rightMatrix.loadRowMajor(child1.getMatrix());
+            if (leftMatrix.length() != rightMatrix.length() || leftMatrix.get(0).length() != rightMatrix.get(0).length()) {
+                throw new IllegalArgumentException("Incompatible matrix sizes for addition");
+            }
+
+
             tasks = createAddTasks();
         }
         else if (type == ComputationNodeType.NEGATE) {
@@ -138,4 +150,12 @@ public class LinearAlgebraEngine {
         // TODO: return summary of worker activity
         return executor.getWorkerReport();
     }
+
+    public void shutdown() throws InterruptedException {
+        this.executor.shutdown();
+    }   
+
+
+
+
 }
