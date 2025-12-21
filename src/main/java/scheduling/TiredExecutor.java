@@ -13,23 +13,99 @@ public class TiredExecutor {
 
     public TiredExecutor(int numThreads) {
         // TODO
-        workers = null; // placeholder
+        workers = new TiredThread[numThreads];
+        for(int i = 0; i<numThreads; i++){
+            double fatigue_factor = 0.5 + Math.random();
+            workers[i] = new TiredThread(i, fatigue_factor);
+            idleMinHeap.add(workers[i]);
+
+            workers[i].start();
+        }
     }
 
     public void submit(Runnable task) {
         // TODO
+       try{
+            TiredThread worker = idleMinHeap.take();
+            
+            inFlight.incrementAndGet();
+
+            
+            Runnable wrapper = () -> {
+                try{
+                    task.run();
+                }
+                finally{
+                    idleMinHeap.add(worker);
+                    inFlight.decrementAndGet();
+
+                    synchronized(inFlight) {
+                        inFlight.notifyAll(); 
+                    }
+                }
+            };
+            worker.newTask(wrapper);
+            
+        }
+        catch(InterruptedException e){
+            Thread.currentThread().interrupt();
+        }
+
     }
 
     public void submitAll(Iterable<Runnable> tasks) {
         // TODO: submit tasks one by one and wait until all finish
+        for(Runnable task: tasks){
+            submit(task);         
+        }
+        synchronized(inFlight) {
+            while (inFlight.get() > 0) {
+                try {
+                    inFlight.wait(); 
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
+        }
     }
 
     public void shutdown() throws InterruptedException {
         // TODO
+        for(TiredThread worker: workers){
+            worker.shutdown();
+        }
+        for(TiredThread worker: workers){
+            worker.join();
+        }
     }
 
     public synchronized String getWorkerReport() {
         // TODO: return readable statistics for each worker
-        return null;
+        String ans = "";
+        int i = 0;
+        for(TiredThread worker: workers){
+            i++;
+            ans +=  "Worker " + i + ": id " + worker.getWorkerId() + ", fatige " +
+             worker.getFatigue() + ", time used " + worker.getTimeUsed() + ", time idle " + worker.getTimeIdle() + "\n";
+        }
+        return ans;
     }
+    /* public synchronized String getWorkerReport() {
+        // TODO: return readable statistics for each worker
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        for (TiredThread worker : workers) {
+            i++;
+            sb.append("Worker ").append(i)
+              .append(": id ").append(worker.getWorkerId())
+              .append(", fatigue ").append(worker.getFatigue())
+              .append(", time used ").append(worker.getTimeUsed())
+              .append(", time idle ").append(worker.getTimeIdle())
+              .append("\n");
+        }
+        return sb.toString(); sabababaabab
+    } */
+   
+
 }
