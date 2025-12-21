@@ -139,11 +139,24 @@ public class LinearAlgebraEngine {
         return tasks;
     }
 
+    
+
     public List<Runnable> createTransposeTasks() {
-        // TODO: return tasks that transpose rows
-        // matrix was loaded as column-major already 
-        return java.util.Collections.emptyList();
+        List<Runnable> tasks = new ArrayList<>();
+        int rows = leftMatrix.length();
+        for (int i = 0; i < rows; i++) {
+            final int index = i;
+            tasks.add(() -> {
+                SharedVector v = leftMatrix.get(index);
+                v.transpose();
+            
+            });
+            
+        }
+        
+        return tasks;
     }
+
 
     public String getWorkerReport() {
         

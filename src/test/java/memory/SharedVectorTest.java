@@ -95,6 +95,35 @@ class SharedVectorTest {
                 "Dot product should fail if second vector is not COLUMN_MAJOR");
     }
 
+    // Test for the Red lines at 145-146 (Null Matrix)
+    @Test
+    void testVecMatMulNull() {
+        assertThrows(IllegalArgumentException.class, () -> rowVector.vecMatMul(null),
+            "Should throw exception when matrix is null");
+    }
+
+// Case 1: Non-Empty Vector vs Empty Matrix -> SHOULD FAIL
+    @Test
+    void testVecMatMulEmptyMatrix_NonEmptyVector() {
+        SharedMatrix emptyMatrix = new SharedMatrix();
+        
+        // We tell JUnit: "I expect this specific line to fail with this specific error"
+        assertThrows(IllegalArgumentException.class, 
+            () -> rowVector.vecMatMul(emptyMatrix),
+            "Should throw exception because vector has data {1,2,3} but matrix is empty"
+        );
+    }
+
+    // Case 2: Empty Vector vs Empty Matrix -> SHOULD SUCCEED
+    @Test
+    void testVecMatMulEmptyMatrix_EmptyVector() {
+        SharedVector emptyVec = new SharedVector(new double[]{}, VectorOrientation.ROW_MAJOR);
+        SharedMatrix emptyMatrix = new SharedMatrix();
+        
+        // This is valid math (0x0 * 0x0 = 0), so it should not throw
+        assertDoesNotThrow(() -> emptyVec.vecMatMul(emptyMatrix));
+        assertEquals(0, emptyVec.length());
+    }
     // --- Vector-Matrix Multiplication (vecMatMul) ---
 
     @Test
