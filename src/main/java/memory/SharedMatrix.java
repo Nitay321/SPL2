@@ -18,7 +18,7 @@ public class SharedMatrix {
         for(int i = 0; i<matrix.length; i++){
             this.vectors[i] = new SharedVector(matrix[i], VectorOrientation.ROW_MAJOR); 
         }
-    }//sabababbabbabaa
+    }
 
     public void loadRowMajor(double[][] matrix) {
         // TODO: replace internal data with new row-major matrix
