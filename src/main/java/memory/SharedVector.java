@@ -82,10 +82,39 @@ public class SharedVector {
 
     public void add(SharedVector other) {
         // TODO: add two vectors
-        writeLock();
-        other.readLock();
-        try{
-            if(this.orientation == other.orientation && this.vector.length == other.vector.length){
+        if (System.identityHashCode(this) <= System.identityHashCode(other)) {
+            this.writeLock();
+            try{
+                other.readLock();
+                try{
+                    addOther(other);
+                }
+                finally{
+                    other.readUnlock();
+                }
+            }
+            finally{
+                this.writeUnlock();
+            }
+        }
+        else{
+            other.readLock();           
+            try{
+                this.writeLock();
+                try{
+                    addOther(other);
+                }
+                finally{
+                    this.writeUnlock();
+                }
+            }
+            finally{
+                other.readUnlock();
+            }
+        }
+    }
+    private void addOther(SharedVector other){
+        if(this.orientation == other.orientation && this.vector.length == other.vector.length){
                 for(int i = 0; i<this.vector.length; i++){
                     this.vector[i] = this.vector[i] + other.vector[i];
                 }
@@ -93,11 +122,6 @@ public class SharedVector {
             else{
                 throw new IllegalArgumentException("Dimensions mismatch");
             }
-        }
-        finally{
-            other.readUnlock();
-            writeUnlock();
-        }
     }
 
     public void negate() {
@@ -200,5 +224,6 @@ public class SharedVector {
             writeUnlock();
         }
     }
+    
  }
 
