@@ -15,9 +15,7 @@ int numThreads = Integer.parseInt(args[0]);
       ComputationNode resultNode = engine.run(root); 
 
 
-      OutputWriter.write(resultNode.getMatrix(), outputPath);
-    
-    
+      OutputWriter.write(resultNode.getMatrix(), outputPath);      
     }
 
 
