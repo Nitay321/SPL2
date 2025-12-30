@@ -43,8 +43,7 @@ class SharedVectorTest {
         rowVector.negate();
         assertEquals(-1.0, rowVector.get(0));
         assertEquals(-2.0, rowVector.get(1));
-        assertEquals(-3.0, rowVector.get(2));
-    }
+        assertEquals(-3.0, rowVector.get(2));}
 
 
     @Test
@@ -53,14 +52,13 @@ class SharedVectorTest {
         rowVector.add(other);
 
         assertEquals(5.0, rowVector.get(0));
-        assertEquals(9.0, rowVector.get(2));
-    }
+        assertEquals(9.0, rowVector.get(2));}
 
     @Test
     void testAddFailDimensions() {
         SharedVector wrongSize = new SharedVector(new double[]{1.0, 2.0}, VectorOrientation.ROW_MAJOR);
         assertThrows(IllegalArgumentException.class, () -> rowVector.add(wrongSize), 
-                "Should fail when adding vectors of different lengths");
+                "should fail when adding vectors of different lengths");
     }
 
     @Test
@@ -93,9 +91,8 @@ class SharedVectorTest {
     void testVecMatMulEmptyMatrix_NonEmptyVector() {
         SharedMatrix emptyMatrix = new SharedMatrix();
         
-        assertThrows(IllegalArgumentException.class, 
-            () -> rowVector.vecMatMul(emptyMatrix),
-            "Should throw exception because vector has data {1,2,3} but matrix is empty"
+        assertThrows(IllegalArgumentException.class, () -> rowVector.vecMatMul(emptyMatrix),
+            "should throw exception because vector has data {1,2,3} but matrix is empty"
         );
     }
 
@@ -103,7 +100,7 @@ class SharedVectorTest {
     void testVecMatMulEmptyMatrix_EmptyVector() {
         SharedVector emptyVec = new SharedVector(new double[]{}, VectorOrientation.ROW_MAJOR);
         SharedMatrix emptyMatrix = new SharedMatrix();
-        
+
         assertDoesNotThrow(() -> emptyVec.vecMatMul(emptyMatrix));
         assertEquals(0, emptyVec.length());
     }
@@ -121,7 +118,6 @@ class SharedVectorTest {
         m.loadColumnMajor(matData);
 
         v.vecMatMul(m);
-
         assertEquals(2, v.length());
         assertEquals(13.0, v.get(0));
         assertEquals(16.0, v.get(1));
@@ -145,7 +141,6 @@ class SharedVectorTest {
         assertThrows(IllegalArgumentException.class, () -> v.vecMatMul(m),
             "Should throw if matrix is not COLUMN_MAJOR");
     }
-
     @Test
     void testVecMatMulFailDimensions() {
         SharedMatrix m = new SharedMatrix();
@@ -153,7 +148,6 @@ class SharedVectorTest {
             {1.0, 2.0},
             {3.0, 4.0}
         }); 
-
         assertThrows(IllegalArgumentException.class, () -> rowVector.vecMatMul(m),
             "Should throw if vector length does not match matrix rows");
     }

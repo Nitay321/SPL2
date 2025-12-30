@@ -15,7 +15,7 @@ class MainTest {
 
     private final ObjectMapper mapper = new ObjectMapper();
     
-    private final String NUM_THREADS = "4"; 
+    private final String thread_amount= "4"; 
 
     private void runAndVerify(String inputPath, String expectedOutputPath, Path tempDir) throws IOException {
         File inputFile = new File(inputPath);
@@ -24,7 +24,7 @@ class MainTest {
         assertTrue(inputFile.exists(), "Input file not found: " + inputFile.getAbsolutePath());
         assertTrue(expectedFile.exists(), "Expected output file not found: " + expectedFile.getAbsolutePath());
         File actualFile = tempDir.resolve("actual_output.json").toFile();
-        String[] args = { NUM_THREADS, inputFile.getPath(), actualFile.getPath() };
+        String[] args = { thread_amount, inputFile.getPath(), actualFile.getPath() };
         Main.main(args);
         assertTrue(actualFile.exists(), "Main did not create an output file!");
         JsonNode actualNode = mapper.readTree(actualFile);
