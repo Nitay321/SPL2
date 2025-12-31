@@ -94,7 +94,7 @@ public class TiredExecutor {
         int i = 0;
         for(TiredThread worker: workers){
             i++;
-            ans +=  "Worker " + i + ": id " + worker.getWorkerId() + ", fatige " +
+            ans +=  "Worker " + i + ": id " + worker.getWorkerId() + ", fatigue " +
              worker.getFatigue() + ", time used " + worker.getTimeUsed() + ", time idle " + worker.getTimeIdle() + "\n";
         }
         return ans;

@@ -107,4 +107,5 @@ private void printMatrix(double[][] matrix) {
         ));
         assertThrows(RuntimeException.class, () -> engine.run(root));
     }
+
 }

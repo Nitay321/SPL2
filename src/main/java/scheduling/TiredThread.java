@@ -47,6 +47,9 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
     }
 
     public long getTimeIdle() {
+        if (!busy.get()) 
+            return timeIdle.get() + (System.nanoTime() - idleStartTime.get());
+        
         return timeIdle.get();
     }
 
@@ -99,7 +102,9 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
                 try{
                     task.run();
                 }
-                
+                catch (RuntimeException e) {
+                    System.err.println("Worker " + id + " failed: " + e.getMessage());
+                }
                 finally{
                     long finish_task = System.nanoTime();
                     timeUsed.addAndGet(finish_task-start_task);
