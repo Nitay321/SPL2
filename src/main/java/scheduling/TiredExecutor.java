@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+
 public class TiredExecutor {
 
     private final TiredThread[] workers;
@@ -44,7 +45,14 @@ public class TiredExecutor {
                     }
                 }
             };
-            worker.newTask(wrapper);
+            try {
+                worker.newTask(wrapper); 
+            } 
+            catch (Exception e) {
+                inFlight.decrementAndGet();
+                synchronized (inFlight) { inFlight.notifyAll(); }
+                throw new RuntimeException("Worker rejected task", e);
+            }
             
         }
         catch(InterruptedException e){
@@ -90,22 +98,5 @@ public class TiredExecutor {
              worker.getFatigue() + ", time used " + worker.getTimeUsed() + ", time idle " + worker.getTimeIdle() + "\n";
         }
         return ans;
-    }
-    /* public synchronized String getWorkerReport() {
-        // TODO: return readable statistics for each worker
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        for (TiredThread worker : workers) {
-            i++;
-            sb.append("Worker ").append(i)
-              .append(": id ").append(worker.getWorkerId())
-              .append(", fatigue ").append(worker.getFatigue())
-              .append(", time used ").append(worker.getTimeUsed())
-              .append(", time idle ").append(worker.getTimeIdle())
-              .append("\n");
-        }
-        return sb.toString(); 
-    } */
-   
-
+    } 
 }

@@ -15,83 +15,83 @@ class TiredThreadTest {
     private final double FATIGUE_FACTOR = 1.0;
 
     @BeforeEach
-    void setUp() {
+    void setWorker() {
         worker = new TiredThread(WORKER_ID, FATIGUE_FACTOR);
         worker.start();
     }
 
     @AfterEach
-    void tearDown() {
+    void killWorker() {
         if (worker.isAlive()) {
             worker.shutdown();
             try {
                 worker.join(1000);
-            } catch (InterruptedException ignored) {
+            } catch (InterruptedException e) {
             }
         }
     }
 
     @Test
-    void testInitialization() {
+    void checkWorkerAttributes() {
         assertEquals(WORKER_ID, worker.getWorkerId());
         assertEquals(0, worker.getTimeUsed());
         assertEquals(0, worker.getFatigue());
     }
 
     @Test
-    void testTaskExecution() throws InterruptedException {
+    void checkTaskForWorker() throws InterruptedException {
         Object monitor = new Object();
-        AtomicBoolean isDone = new AtomicBoolean(false);
+        AtomicBoolean finished = new AtomicBoolean(false);
 
         worker.newTask(() -> {
             synchronized (monitor) {
-                isDone.set(true);
+                finished.set(true);
                 monitor.notifyAll();
             }
         });
 
         synchronized (monitor) {
-            while (!isDone.get()) {
-                monitor.wait(2000);
+            while (!finished.get()) {
+                monitor.wait(1000);
             }
         }
 
-        assertTrue(isDone.get());
+        assertTrue(finished.get());
     }
 
     @Test
-    void testMetricsUpdate() throws InterruptedException {
-        long sleepTime = 50;
+    void checkTimeAndFatigue() throws InterruptedException {
+        long sleep_time = 100;
         Object monitor = new Object();
-        AtomicBoolean isDone = new AtomicBoolean(false);
+        AtomicBoolean finished = new AtomicBoolean(false);
 
         worker.newTask(() -> {
             try {
-                Thread.sleep(sleepTime);
+                Thread.sleep(sleep_time);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } finally {
                 synchronized (monitor) {
-                    isDone.set(true);
+                    finished.set(true);
                     monitor.notifyAll();
                 }
             }
         });
 
         synchronized (monitor) {
-            while (!isDone.get()) {
-                monitor.wait(2000);
+            while (!finished.get()) {
+                monitor.wait(1000);
             }
         }
 
-        Thread.sleep(10);
+        Thread.sleep(50);
 
-        assertTrue(worker.getTimeUsed() >= sleepTime * 1_000_000);
+        assertTrue(worker.getTimeUsed() >= sleep_time * 1_000_000);
         assertTrue(worker.getFatigue() > 0);
     }
 
     @Test
-    void testBusyStateAndQueueCapacity() throws InterruptedException {
+    void checkFullQueue() throws InterruptedException {
         Object monitor = new Object();
         
         worker.newTask(() -> {
@@ -117,9 +117,9 @@ class TiredThreadTest {
     }
 
     @Test
-    void testShutdown() throws InterruptedException {
+    void checkWorkerStops() throws InterruptedException {
         worker.shutdown();
-        worker.join(2000);
+        worker.join(1000);
         assertFalse(worker.isAlive());
     }
 }
