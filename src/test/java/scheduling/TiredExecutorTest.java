@@ -21,14 +21,14 @@ class TiredExecutorTest {
     }
 
     @AfterEach
-    void killExecutor() {
+    void killExecutor() throws InterruptedException{
         if (executor != null) {
             executor.shutdown();
         }
     }
 
     @Test
-    void checkAllTasksRun() {
+    void checkAllTasksRun(){
         int total_tasks = 20;
         AtomicInteger count = new AtomicInteger(0);
         List<Runnable> tasks = new ArrayList<>();
@@ -53,7 +53,7 @@ class TiredExecutorTest {
                 try {
                     Thread.sleep(10); 
                 } catch (InterruptedException e) {
-\                }
+            }
                 count.incrementAndGet();
             });
         }
