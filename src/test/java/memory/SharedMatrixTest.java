@@ -5,52 +5,52 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SharedMatrixTest {
 
-    private final double[][] data3x3 = {
+    private final double[][] data3_3 = {
         {1.0, 2.0, 3.0},
         {4.0, 5.0, 6.0},
         {7.0, 8.0, 9.0}
     };
 
-    private final double[][] data2x3 = {
+    private final double[][] data2_3 = {
         {10.0, 20.0, 30.0},
         {40.0, 50.0, 60.0}
     };
 
     @Test
-    void testConstructorAndReadRowMajor() {
-        SharedMatrix matrix = new SharedMatrix(data3x3);
+    void checkconstructor() {
+        SharedMatrix matrix = new SharedMatrix(data3_3);
 
         assertEquals(VectorOrientation.ROW_MAJOR, matrix.getOrientation(), "Default constructor should be ROW_MAJOR");
         
         double[][] result = matrix.readRowMajor();
-        assertArrayEquals(data3x3, result, "Read data should match constructor data");
+        assertArrayEquals(data3_3, result, "Read data should match constructor data");
     }
 
     @Test
-    void testLoadColumnMajor() {
+    void checkLoadColumnMajor() {
         SharedMatrix matrix = new SharedMatrix();
-        matrix.loadColumnMajor(data2x3);
+        matrix.loadColumnMajor(data2_3);
 
         assertEquals(VectorOrientation.COLUMN_MAJOR, matrix.getOrientation(), "Orientation should be COLUMN_MAJOR");
         
         assertEquals(3, matrix.length(), "Column major matrix length should equal number of columns (3)");
 
         double[][] result = matrix.readRowMajor();
-        assertArrayEquals(data2x3, result, "readRowMajor should return original structure even if stored as Column Major");
+        assertArrayEquals(data2_3, result, "readRowMajor should return original structure even if stored as Column Major");
     }
 
     @Test
-    void testLoadRowMajor() {
-        SharedMatrix matrix = new SharedMatrix();
-        matrix.loadRowMajor(data2x3);
+    void checkLoadRowMajor() {
+        SharedMatrix matrix =new SharedMatrix();
+        matrix.loadRowMajor(data2_3);
 
         assertEquals(VectorOrientation.ROW_MAJOR, matrix.getOrientation());
         assertEquals(2, matrix.length(), "Row major matrix length should equal number of rows (2)");
-        assertArrayEquals(data2x3, matrix.readRowMajor());
+        assertArrayEquals(data2_3, matrix.readRowMajor());
     }
 
     @Test
-    void testInvalidInputs() {
+    void checkInvalidInputs() {
         SharedMatrix matrix = new SharedMatrix();
 
         assertThrows(IllegalArgumentException.class, () -> new SharedMatrix(null));
@@ -58,16 +58,16 @@ class SharedMatrixTest {
 
         assertThrows(IllegalArgumentException.class, () -> matrix.loadRowMajor(new double[][]{}));
         
-        double[][] jagged = {
+        double[][] illegal_size = {
             {1, 2},
             {3, 4, 5} 
         };
-        assertThrows(IllegalArgumentException.class, () -> matrix.loadRowMajor(jagged));
+        assertThrows(IllegalArgumentException.class, () -> matrix.loadRowMajor(illegal_size));
     }
 
     @Test
-    void testGetVector() {
-        SharedMatrix matrix = new SharedMatrix(data3x3);
+    void checkGetVector() {
+        SharedMatrix matrix = new SharedMatrix(data3_3);
         
         SharedVector vec = matrix.get(1);
         
@@ -78,7 +78,7 @@ class SharedMatrixTest {
     }
 
     @Test
-    void testEmptyRead() {
+    void checkempty() {
         SharedMatrix matrix = new SharedMatrix(); 
         double[][] result = matrix.readRowMajor();
         assertEquals(0, result.length, "Reading an uninitialized matrix should return empty array");

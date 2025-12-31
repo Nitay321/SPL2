@@ -14,14 +14,13 @@ class SharedVectorTest {
     private final double[] data = {1.0, 2.0, 3.0};
 
     @BeforeEach
-    void setUp() {
-        rowVector = new SharedVector(data.clone(), VectorOrientation.ROW_MAJOR);
-        colVector = new SharedVector(data.clone(), VectorOrientation.COLUMN_MAJOR);
-    }
+    void setUp() 
+    {   rowVector = new SharedVector(data.clone(), VectorOrientation.ROW_MAJOR);
+        colVector = new SharedVector(data.clone(), VectorOrientation.COLUMN_MAJOR);}
 
 
     @Test
-    void testConstructorAndAccessors() {
+    void checkconstructors() {
         assertEquals(3, rowVector.length(), "Length should be 3");
         assertEquals(VectorOrientation.ROW_MAJOR, rowVector.getOrientation());
         assertEquals(1.0, rowVector.get(0));
@@ -30,7 +29,7 @@ class SharedVectorTest {
 
 
     @Test
-    void testTranspose() {
+    void checkTranspose() {
         rowVector.transpose();
         assertEquals(VectorOrientation.COLUMN_MAJOR, rowVector.getOrientation());
         rowVector.transpose();
@@ -39,7 +38,7 @@ class SharedVectorTest {
 
 
     @Test
-    void testNegate() {
+    void checkNegate() {
         rowVector.negate();
         assertEquals(-1.0, rowVector.get(0));
         assertEquals(-2.0, rowVector.get(1));
@@ -80,36 +79,28 @@ class SharedVectorTest {
         assertThrows(IllegalArgumentException.class, () -> rowVector.dot(row2), 
                 "Dot product should fail if second vector is not COLUMN_MAJOR");
     }
-
     @Test
     void testVecMatMulNull() {
         assertThrows(IllegalArgumentException.class, () -> rowVector.vecMatMul(null),
             "Should throw exception when matrix is null");
     }
-
     @Test
     void testVecMatMulEmptyMatrix_NonEmptyVector() {
         SharedMatrix emptyMatrix = new SharedMatrix();
         
         assertThrows(IllegalArgumentException.class, () -> rowVector.vecMatMul(emptyMatrix),
-            "should throw exception because vector has data {1,2,3} but matrix is empty"
-        );
+            "should throw exception because vector has data {1,2,3} but matrix is empty");
     }
-
     @Test
     void testVecMatMulEmptyMatrix_EmptyVector() {
         SharedVector emptyVec = new SharedVector(new double[]{}, VectorOrientation.ROW_MAJOR);
         SharedMatrix emptyMatrix = new SharedMatrix();
 
         assertDoesNotThrow(() -> emptyVec.vecMatMul(emptyMatrix));
-        assertEquals(0, emptyVec.length());
-    }
-
+        assertEquals(0, emptyVec.length());}
     @Test
     void testVecMatMulSuccess() {
-
         SharedVector v = new SharedVector(new double[]{1.0, 2.0}, VectorOrientation.ROW_MAJOR);
-        
         SharedMatrix m = new SharedMatrix();
         double[][] matData = {
             {3.0, 4.0},
@@ -122,7 +113,6 @@ class SharedVectorTest {
         assertEquals(13.0, v.get(0));
         assertEquals(16.0, v.get(1));
     }
-
     @Test
     void testVecMatMulFailVectorOrientation() {
         SharedMatrix m = new SharedMatrix();

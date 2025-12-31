@@ -17,31 +17,22 @@ class TiredExecutorTest {
 
     @BeforeEach
     void setUp() {
-        executor = new TiredExecutor(NUM_THREADS);
-    }
+        executor = new TiredExecutor(NUM_THREADS);}
 
     @AfterEach
     void tearDown() throws InterruptedException {
         if (executor != null) {
-            executor.shutdown();
-        }
-    }
+            executor.shutdown();}}
 
     @Test
     void testSubmitAllBlocksUntilCompletion() {
-        int numTasks = 20;
+        int numTasks=20;
         AtomicInteger counter = new AtomicInteger(0);
         List<Runnable> tasks = new ArrayList<>();
-
         for (int i = 0; i < numTasks; i++) {
-            tasks.add(counter::incrementAndGet);
-        }
-
+            tasks.add(counter::incrementAndGet);}
         executor.submitAll(tasks);
-
-        assertEquals(numTasks, counter.get());
-    }
-
+        assertEquals(numTasks, counter.get());}
     @Test
     void testConcurrencyAndFairness() {
         int numTasks = 100;
