@@ -6,6 +6,12 @@ public class SharedVector {
 
     private double[] vector;
     private VectorOrientation orientation;
+    /* We use ReentrantReadWriteLock to allow multiple threads to read the vector 
+       simultaneously, while allowing only one thread to write to it at a time.
+       Examples of using read and write in functions:
+       Read: get, length, getOrientation, dot, add, vecMatMul
+       Write: negate, transpose, add, vecMatMul
+    */
     private ReadWriteLock lock = new java.util.concurrent.locks.ReentrantReadWriteLock();
 
     public SharedVector(double[] vector, VectorOrientation orientation) {
@@ -82,6 +88,16 @@ public class SharedVector {
 
     public void add(SharedVector other) {
         // TODO: add two vectors
+       
+        
+        /* 
+        In the add function, we have to read the other object and also write to "this". 
+        Because we need two locks, there is a risk of deadlock if "other" adds "this" 
+        and "this" adds "other" at the same time. That is why we use the hash code 
+        to acquire the locks in a global order that doesn't depend on the direction 
+        of the add operation.     
+         */   
+        
         if (System.identityHashCode(this) <= System.identityHashCode(other)) {
             this.writeLock();
             try{
@@ -194,7 +210,15 @@ public class SharedVector {
         if (matrix.get(0) == null)
             throw new IllegalArgumentException("Invalid matrix");
 
-        double[] temp;
+
+        
+        double[] temp;  /* In this function we calculate the result in a temp array using only read lock, 
+                        so we dont block other threads during the heavy math.  
+                        We only take the write lock at the very end to update the vector quickly. 
+                        */ 
+
+
+
         readLock();
         try {
             if (this.orientation != VectorOrientation.ROW_MAJOR)
@@ -226,4 +250,3 @@ public class SharedVector {
     }
     
  }
-
