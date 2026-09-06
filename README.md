@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 > 📚 **Part of a 3-project series** from the Systems Programming Lab course at **Ben-Gurion University of the Negev**
-> [SPL1 — Settlement Simulation](https://github.com/Nitay321/SPL25-Assignment1) · [SPL2 — Concurrent Microservices](https://github.com/Nitay321/SPL_project_2) · [SPL3 — Real-Time Messaging System](https://github.com/Nitay321/SPL3)
+> [SPL1 — Settlement Simulation](https://github.com/Nitay321/SPL1) · [SPL2 — Concurrent Microservices](https://github.com/Nitay321/SPL2) · [SPL3 — Real-Time Messaging System](https://github.com/Nitay321/SPL3)
 
 An asynchronous, event-driven microservices framework built on pure Java concurrency primitives. Features a thread-safe **Publish-Subscribe Message Bus**, round-robin event load balancing, a custom non-blocking `Future<T>` implementation, and deterministic lifecycle orchestration across concurrent services.
 
