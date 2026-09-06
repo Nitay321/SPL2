@@ -1,4 +1,4 @@
-# ⚡ Concurrent Microservices Framework
+# SPL Project 2 — Concurrent Microservices Framework
 
 [![Java](https://img.shields.io/badge/Java-11%2B-orange.svg?style=flat-square&logo=openjdk)](https://www.oracle.com/java/)
 [![Maven](https://img.shields.io/badge/Build-Maven-C71A36.svg?style=flat-square&logo=apache-maven)](https://maven.apache.org/)
@@ -6,7 +6,10 @@
 [![Pattern](https://img.shields.io/badge/Architecture-Pub--Sub%20%2F%20Event--Driven-brightgreen.svg?style=flat-square)](#architecture-overview)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-An asynchronous, high-throughput, event-driven microservices framework and compute-cluster simulation built on pure Java concurrency primitives. The framework features an in-memory, thread-safe **Publish-Subscribe / Message Bus** message broker, round-robin event load balancing, custom non-blocking/blocking `Future<T>` synchronization, and deterministic lifecycle orchestration.
+> 📚 **Part of a 3-project series** from the Systems Programming Lab course at **Ben-Gurion University of the Negev**
+> [SPL1 — Settlement Simulation](https://github.com/Nitay321/SPL25-Assignment1) · [SPL2 — Concurrent Microservices](https://github.com/Nitay321/SPL_project_2) · [SPL3 — Real-Time Messaging System](https://github.com/Nitay321/SPL3)
+
+An asynchronous, event-driven microservices framework built on pure Java concurrency primitives. Features a thread-safe **Publish-Subscribe Message Bus**, round-robin event load balancing, a custom non-blocking `Future<T>` implementation, and deterministic lifecycle orchestration across concurrent services.
 
 ---
 
